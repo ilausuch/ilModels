@@ -22,7 +22,7 @@ Other:
 
 == Extended reference & examples ==
 
-[https://stackedit.io/viewer#!provider=gist&gistId=c9019cf72e58bba7eb3f9e6c1cd845ad&filename=ilModels.gettingStarted.md|Documentation]
+[Documentation](https://stackedit.io/viewer#!provider=gist&gistId=c9019cf72e58bba7eb3f9e6c1cd845ad&filename=ilModels.gettingStarted.md)
 
 == Examples ==
 
