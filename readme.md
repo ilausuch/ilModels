@@ -51,4 +51,10 @@ Customer.get({Id:....}).then(function(customer){
 
 ```
 
+## License
+
+MIT LICENSE @2016 Ivan Lausuch <ilausuch@gmail.com>
+Developed at CEU University
+
+
 
