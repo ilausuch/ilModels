@@ -15,6 +15,8 @@ For each model you can:
 
 Other:
 
+* OData full feature data provider
+* Define custom data providers
 * Define filtered collections from other one.  
 * Define sync operations
 
