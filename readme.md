@@ -1,4 +1,4 @@
-== ilModels ==
+# ilModels
 
 ilModels a library that simplifies data management of objects provided by OData, RestApi or others Webservices.
 
@@ -20,11 +20,11 @@ Other:
 * Define filtered collections from other one.  
 * Define sync operations
 
-== Extended reference & examples ==
+## Extended reference & examples
 
 [Documentation](https://stackedit.io/viewer#!provider=gist&gistId=c9019cf72e58bba7eb3f9e6c1cd845ad&filename=ilModels.gettingStarted.md)
 
-== Examples ==
+## Examples
 
 
 Example 1. Loading all customers and their purchases
