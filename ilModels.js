@@ -1,6 +1,7 @@
 /*
     MIT LICENSE @2016 Ivan Lausuch <ilausuch@gmail.com>
 	Developed at CEU University
+	Beta 2
 */
 ilModel = function(config){
 	
@@ -29,7 +30,7 @@ ilModel = function(config){
             this.$data[field.name] = from[field.name];
         }, this)
         
-        this.$toDerivateObjectsAllFields(this);
+        this.$toVirtualObjectsAllFields(this);
     }
 
     this.copyTo = function (object,to) {
@@ -195,27 +196,27 @@ ilModel = function(config){
     }
     
     //----------------------------------------------------------------------------
-    // Derivates
+    // Virtual
     //----------------------------------------------------------------------------
     
-    this.$toDerivateObjectsField=function(object,field){
-	    if (field.derivated!=undefined)
+    this.$toVirtualObjectsField=function(object,field){
+	    if (field.virtual!=undefined)
 	    	if (object.$data[field.name]!=undefined)
-		    	object.$derivatedData[field.derivated.name]=field.derivated.toDerivated(object.$data[field.name],object);
+		    	object.$virtualData[field.virtual.name]=field.virtual.toVirtual(object.$data[field.name],object);
 		    else
-		    	object.$derivatedData[field.derivated.name]=undefined;
+		    	object.$virtualData[field.virtual.name]=undefined;
     }
     
-    this.$toDerivateObjectsAllFields=function(object){
+    this.$toVirtualObjectsAllFields=function(object){
 	    this.$fields.forEach(function(field){
-		    this.$toDerivateObjectsField(object,field);    	
+		    this.$toVirtualObjectsField(object,field);    	
 	    },this)
     }
     
-    this.$fromDerivateObjectsField=function(object,field){
-	    if (field.derivated!=undefined){
-	    	if (object.$derivatedData[field.derivated.name]!=undefined)
-		    	object.$data[field.name]=field.derivated.fromDerivated(object.$derivatedData[field.derivated.name],object);
+    this.$fromVirtualObjectsField=function(object,field){
+	    if (field.virtual!=undefined){
+	    	if (object.$virtualData[field.virtual.name]!=undefined)
+		    	object.$data[field.name]=field.virtual.fromVirtual(object.$virtualData[field.virtual.name],object);
 		    else
 		    	object.$data[field.name]=undefined;
 		
@@ -228,9 +229,9 @@ ilModel = function(config){
 		}
     }
     
-    this.$fromDerivateObjectsAllFields=function(object){
+    this.$fromVirtualObjectsAllFields=function(object){
 	    this.$fields.forEach(function(field){
-			this.$fromDerivateObjectsField(object,field);	
+			this.$fromVirtualObjectsField(object,field);	
 	    },this)
     }
 
@@ -243,7 +244,7 @@ ilModel = function(config){
 	    
         this.$sandbox = {
 	        $data:{},
-	        $derivatedData:{},
+	        $virtualData:{},
 	        $owner:this
 		};
         
@@ -266,27 +267,27 @@ ilModel = function(config){
 						
 					this.$data[field.name]=value;
 					
-					if (field.derivated)
-						$owner.$toDerivateObjectsField(this,field);
+					if (field.virtual)
+						$owner.$toVirtualObjectsField(this,field);
 				}
 			})
 			
-			if (field.derivated!=undefined){
-				Object.defineProperty(this.$sandbox,field.derivated.name,{
+			if (field.virtual!=undefined){
+				Object.defineProperty(this.$sandbox,field.virtual.name,{
 					get:function(){
-						return this.$derivatedData[field.derivated.name];
+						return this.$virtualData[field.virtual.name];
 					},
 					set:function(value){
-						this.$derivatedData[field.derivated.name]=value;
+						this.$virtualData[field.virtual.name]=value;
 
-						$owner.$fromDerivateObjectsField(this,field);
+						$owner.$fromVirtualObjectsField(this,field);
 					}
 				})
 			}
 		},this);
 		
-		//Prepare derivated fields
-		this.$toDerivateObjectsAllFields(this.$sandbox);
+		//Prepare virtual fields
+		this.$toVirtualObjectsAllFields(this.$sandbox);
         
         if (this.onSandbox != undefined) this.onSandbox();
         return this.$sandbox;
@@ -444,7 +445,7 @@ ilModel = function(config){
 					op="modify";
 				
 				if (options.dataProvider[op]==undefined)
-					throw new ilModelException(this.$className,"Operation "+op+" isn't defined on dataprovider",{theObject:this,theDataProvider:options.dataProvider});
+					throw new ilModelException(this.$className,"Operation "+op+" isn't defined on data provider",{theObject:this,theDataProvider:options.dataProvider});
 						
 				options.dataProvider[op]($this.getPk(),data).then(function(data){
 					promise.ready(data);
@@ -578,8 +579,6 @@ ilModel = function(config){
 		this.$class.postConstructor=config.postConstructor;
 		this.$class.$methods=config.methods;
 		
-		//TODO: Static methods in config
-		
 		//Define internal Uid System
 		this.$class.$nextUid=0;
 		this.$class.getNextUid=function(){
@@ -633,12 +632,14 @@ ilModel = function(config){
 	        for (var name in config.dataProviders){    
 		        this.$class.$dataProviders[name]=config.dataProviders[name];
 		        
-		        try{
-		        	this.$class.$dataProviders[name].init(this.$class,name);
-		        }
-		        catch(e){
-			        throw new ilModelException("ilModel","Data provider "+name+" is invalid or dosen't have init function",this.$class.$dataProviders[name])
-		        }
+		        if (this.$class.$dataProviders[name].init!=undefined){
+			        try{
+			        	this.$class.$dataProviders[name].init(this.$class,name);
+			        }
+			        catch(e){
+				        throw new ilModelException("ilModel","Data provider "+name+" has an incorrect init function",this.$class.$dataProviders[name])
+			        }
+			    }
 		        
 		        if (isTheFirstDataProvider){
 			        if (this.$options.defaultDataProvider==undefined)
@@ -696,14 +697,11 @@ ilModel = function(config){
 	
 			if (options.dataProvider==undefined)
 				options.dataProvider=this.$class.$options.defaultDataProvider;
-				
-			if (options.dataProvider==undefined)
-				throw new ilModelException(this.$className,"You must define a dataprovider in defaults or in config",options);
 			
 			options.dataProvider=this.$class.$dataProviders[options.dataProvider];
 				
 			if (options.dataProvider==undefined)
-				throw new ilModelException($this.$className,"You must define a valid dataprovider in defaults or in config",options);
+				throw new ilModelException($this.$className,"There are no a data provider",options);
 			
 				
 			return options;
@@ -844,7 +842,7 @@ ilModel = function(config){
 		this.$className=this.$class.$className;
 		
 		this.$data={};
-		this.$derivatedData={};
+		this.$virtualData={};
 		this.$associations={};
 		this.$associationsCacheData={};
 		
@@ -866,7 +864,7 @@ ilModel = function(config){
 		
 		//Create set&get of fields
 		this.$fields.forEach(function(field){
-			//TODO : Check property is not already defined
+			//Check property is not already defined
 			if (field.name in this)
 				throw new ilModelException(this.$className,"Duplicated property "+field.name,{theObject:this,theField:field});
 			
@@ -883,8 +881,8 @@ ilModel = function(config){
 					
 						this.$data[field.name]=value;
 						
-						if (field.derivated!=undefined)
-							this.$toDerivateObjectsField(this,field);
+						if (field.virtual!=undefined)
+							this.$toVirtualObjectsField(this,field);
 					}
 					
 					var associations=this.$class.getAssociationsOfField(field);
@@ -897,11 +895,11 @@ ilModel = function(config){
 				}
 			})
 			
-			if (field.derivated!=undefined){
+			if (field.virtual!=undefined){
 				try{
-					Object.defineProperty(this,field.derivated.name,{
+					Object.defineProperty(this,field.virtual.name,{
 						get:function(){
-							return this.$derivatedData[field.derivated.name];
+							return this.$virtualData[field.virtual.name];
 						},
 						set:function(value){
 							if (field.readOnly)
@@ -910,13 +908,13 @@ ilModel = function(config){
 							if (this.$setAndGet.locked)
 								throw new ilModelException(this.$className,"Cannot modify "+field.name+" use $sandbox",{theValue:value});
 							
-							this.$derivatedData[field.derivated.name]=value;
+							this.$virtualData[field.virtual.name]=value;
 	
-							this.$fromDerivateObjectsField(this,field);
+							this.$fromVirtualObjectsField(this,field);
 						}
 					})
 				}catch(e){
-					throw new ilModelException(this.$className,"Cannot define a derivated variable, already declared" ,{theField:field.name,theFieldDerivated:field.derivated.name});
+					throw new ilModelException(this.$className,"Cannot define a virtual variable, already declared" ,{theField:field.name,theFieldVirtual:field.virtual.name});
 				}
 			}
 		},this);
@@ -1117,11 +1115,25 @@ ilModelField=function(name, type, config){
 	this.auto=byDefault(config.auto,false);
 	this.byDefaultValue=config.byDefault;
 	
-	this.validateFnc=config.validateFnc;
-	//TODO Check its a valid fnc
+	this.validateFnc=config.validateFnc; //TODO Check its a valid fnc
 	
-	this.derivated=config.derivated;
-	//TODO Check is a derivated object
+	
+	//Virtual objects
+	if (config.virtual!=undefined){
+		this.virtual=config.virtual;
+	}
+	else if (config.derivated!=undefined){ //Compatibility with Beta 1
+			this.virtual={
+				name:config.derivated.name,
+				toVirtual:config.derivated.toDerivated,
+				fromVirtual:config.derivated.fromDerivated
+			}
+		}
+		
+	//Check is a virtual object
+	if (this.virtual!=undefined && (this.virtual.name==undefined || this.virtual.toVirtual==undefined || this.virtual.fromVirtual==undefined))
+		throw new ilModelException("ilModelField","Invalid virtural field configuration",{field:this});
+		
 	
 	this.sendException=function(dueto,value){
 		throw new ilModelException("ilModelField",dueto+" of "+this.name+"("+this.type+") = "+value,{field:this,value:value});
@@ -1539,7 +1551,6 @@ ilModelAssociation=function(type,associated,by,options){
 		this.ownerClass=ownerClass;
 	}	
 		
-	//TODO CHECK
 	this.get=function(object){
 		if (object.$associationsCacheData[this.fieldName]!=undefined){
 			var promise=new ilModelPromise();
@@ -1597,13 +1608,13 @@ ilModelAssociation=function(type,associated,by,options){
 	}
 }
 
-//TODO: Añadir opciones para forceReload
+//TODO: Add options for forceReload
 
 ilModelAssociation.one=function(associated,by){
 	return new ilModelAssociation("one",associated,by);	
 }
 
-//TODO: Añadir opciones para forceReload
+//TODO: Add options for forceReload
 
 ilModelAssociation.multiple=function(associated,by,query){
 	return new ilModelAssociation("multiple",associated,by,query);	
@@ -2006,7 +2017,7 @@ ilModelDataProviderOData.toQueryString=function(Model,query){
 					comp="substringof("+query.fieldName+","+value+")";
 				break;
 				
-				//TODO: Consult https://msdn.microsoft.com/en-us/library/hh169248(v=nav.90).aspx
+				//TODO: Add more options of quering, Consult https://msdn.microsoft.com/en-us/library/hh169248(v=nav.90).aspx
 				//length
 				//replace
 				//substring
@@ -2234,6 +2245,11 @@ ilModelPromiseSync=function(options){
 		this.owner=options.owner;
 	
 	this.syncList=[];
+	
+	this.addTask=function(startFunction,options){
+		var task=this.add(options);
+		startFunction(task);
+	}
 	
 	this.add=function(options){
 		this.isLoading=true;
