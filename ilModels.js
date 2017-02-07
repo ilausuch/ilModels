@@ -299,7 +299,7 @@ ilModel = function(config){
 	    if (this.$sandbox == undefined)
 	    	this.$sendException("Sandbox not created, use prepareSandbox before");
 		
-		this.$fromDerivateObjectsAllFields(this.$sandbox);
+		this.$fromVirtualObjectsAllFields(this.$sandbox);
 	    this.validateSandbox();
 	    
 	    var info={
@@ -380,7 +380,7 @@ ilModel = function(config){
     	this.$isNew=false;
 		this.updateFrom(this.$sandbox);
 		this.validate();
-		this.$toDerivateObjectsAllFields(this);
+		this.$toVirtualObjectsAllFields(this);
 		
     }
 
@@ -919,7 +919,6 @@ ilModel = function(config){
 			}
 		},this);
 		
-		//this.$toDerivateObjectsAllFields(this);
 		
 		//Create set&get of associations
 		if (this.$class.$associations){
@@ -1780,9 +1779,9 @@ ilModelDataProviderOData = function (config) {
 
 		if (config.orderby != undefined)
 			if (config.orderbyDesc != undefined && config.orderbyDesc)
-				url = url + "$orderby=" + config.operation + "desc &";
+				url = url + "$orderby=" + config.orderby + "desc &";
 			else
-				url = url + "$orderby=" + config.operation + "&";
+				url = url + "$orderby=" + config.orderby + "&";
 			
 		if (config.operation != undefined)
 			url = url + "$$op=" + config.operation + "&";
