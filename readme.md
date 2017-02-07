@@ -1,5 +1,7 @@
 # ilModels
 
+[Click here to full experience documentation](https://stackedit.io/viewer#!provider=gist&gistId=c9019cf72e58bba7eb3f9e6c1cd845ad&filename=ilModels.gettingStarted.md)
+
 ilModels a library that simplifies data management of objects provided by OData, RestApi or others Webservices.
 
 For each model you can:
@@ -20,7 +22,6 @@ Other:
 * Define filtered collections from other one.  
 * Define sync operations
 
-[Always update documentation](https://stackedit.io/viewer#!provider=gist&gistId=c9019cf72e58bba7eb3f9e6c1cd845ad&filename=ilModels.gettingStarted.md)
 
 ## Examples
 
@@ -968,7 +969,3 @@ TODO
 
 ## <i class=" icon-megaphone"></i> The events emitter
 TODO
-
-
-
-
