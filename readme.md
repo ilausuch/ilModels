@@ -939,33 +939,299 @@ postConstructor : function (object) {
 }
 ```
 
+##  <i class="icon-level-up"></i> Inicializations
+
+ilModels requires a inizialization.  It needs http object to perform queries and delay function
+
+### With angular
+
+You can call to:
+
+```javascript
+ilModelConfiguration.setupDefaultAngularContext($http, $timeout);
+```
+
+### Without angular
+
+#### http object
+
+You must create an object that includes the method: `call(config)` this method must return a promise.
+
+```javascript
+ilModelConfiguration.defaultContext.http={
+	call:function(config){
+		var promise=new ilModelPromise();
+		//TODO Operation
+		return promise;
+	}	
+}
+```
+
+The param config have this attributes:
+
+url
+: URL To call
+
+headers (optional)
+: HTTP Headers
+
+method (optional)
+: Method to perform GET, POST, PUT, DELETE, MERGE, PATCH ....
+
+data (optional)
+: Data to send (for instance in POST or PUT methods)
+
+#### delay function
+
+This is the delay function by default
+
+```javascript
+ilModelConfiguration.defaultContext.delayFnc=
+function(callback){
+	setTimeout(callback)
+};
+```
+
+
+##  <i class="icon-cloud"></i> Design data providers
+
+It is possible that you need to do queries without ODATA or sometimes is interesting to design a data provider. You can create your own data provider.
+
+You can declare:
+
+init:function(parentClass,name)
+: Initializations function. You will recieve parentClass and the name assigned to this provider
+
+get:function(pk,options)
+: Get function
+
+query:function(query,options)
+: Query function
+
+all:function(options)
+: All function
+
+create:function(data)
+: Create function
+
+modify:function(pk,data)
+: Modify function
+
+replace:function(pk,data)
+: Replace function
+
+remove:function(pk)
+: Remove function
+
+
+This is a full example
+
+```javascript
+myProvider:{ 
+	init:function(parentClass,name){
+	},
+						
+	get:function(pk,options){
+		var promise=new ilModelPromise();
+		//TODO : Do something							
+		return promise;
+	},
+
+	query:function(query,options){
+		var promise=new ilModelPromise();
+		//TODO : Do something
+		return promise;
+	},
+						
+	all:function(options){
+		var promise=new ilModelPromise();
+		//TODO : Do something
+		return promise;
+	},
+						
+	create:function(data){
+		var promise=new ilModelPromise();
+		//TODO : Do something
+		return promise;
+	},
+						
+	modify:function(pk,data){
+		var promise=new ilModelPromise();
+		//TODO : Do something
+		return promise;
+	},
+
+	replace:function(pk,data){
+		var promise=new ilModelPromise();
+		//TODO : Do something
+		return promise;
+	},
+						
+	remove:function(pk){
+		var promise=new ilModelPromise();
+		//TODO : Do something
+		return promise;
+	}
+}
+```
+
+## <i class="icon-cog-alt"></i> Global configuration
+
+ilModels has a default configuration you can manipulate
+
+```javascript
+ilModelConfiguration={
+	basics:{
+		validateOnCreate:true,
+		validateOnCreateNew:false,
+		validateGenerateException:true,
+		
+	},
+	dataProviders:{
+		forceReload:false,
+		useReplaceInsteadModify:false,
+	},
+	cache:{
+		createCacheByDefault:true,
+		autoInsert:true,
+		collections:{
+			preventReload:true
+		}
+	},
+	defaultContext:{
+		delayFnc:function(callback){setTimeout(callback)},
+		http:undefined
+	}
+}
+```
+
+ilModelConfiguration.basics.validateOnCreate
+: Validate a model when is created with data
+
+ilModelConfiguration.basics.validateOnCreateNew
+: Validate a model when is created without data
+
+ilModelConfiguration.basics.validateGenerateException
+: If validation fails then an exception is generated
+
+ilModelConfiguration.dataProviders.forceReload
+: Force reload of all data providers operations by default included associations 
+
+ilModelConfiguration.dataProviders.useReplaceInsteadModify
+: Use replace operation instead modify operation in update calls. It depends from how data provider has been design
+
+ilModelConfiguration.dataProviders.cache.createCacheByDefault
+: Each model has a cache to have a good performance when you has to get an object of this model and to have unique object representing an object on data base
+
+ilModelConfiguration.dataProviders.cache.autoInsert
+: It is related to previous createCacheByDefault because define that a new model is created this is inserted on cache
+
+ilModelConfiguration.dataProviders.cache.collections.preventReload
+: For collections, prevent reload and application must have to do the reloads 
+
+
 ## <i class="icon-book"></i> Collections 
 
-A collection is a list of objects of a unique model.
+A collection is a list of objects of objects the same model. 
 
-TODO
+To access to collection data is:
 
-###   Auto Filtered collections
+```javascript
+myCollection.data
+```
 
-TODO
 
 ###   Manual collection
 
-TODO
+In this case manipulation of collection is manual.
 
-##  <i class="icon-level-up"></i> Inicializations
+#### Declaration
 
-### ilModelHttpAngular
+```javascript
+var myCollection=ilModelCollection(config);
+```
 
-ilModelConfiguration.setupDefaultAngularContext($http, $timeout);
+In this case, config options are:
 
-TODO
+sortFnc(a,b)
+: Sort function
 
-##  <i class="icon-cloud"></i> Design data providers
-TODO
+data (optional)
+: Array with initial data 
 
-## <i class="icon-cog-alt"></i> Global configuration
-TODO
+promise (optional)
+: Instead of data, if you don't have data yet you can use a promise
 
-## <i class=" icon-megaphone"></i> The events emitter
-TODO
+#### Operations:
+
+add(object or array)
+: Insert an object or array into collection
+
+remove(object)
+: Remove an inserted object
+
+where(pk)
+: Get position of object using its primary key (pk)
+
+get(pk)
+: Get an object using its primary key (pk
+
+sort()
+: Sort using sort function defined in config
+
+extract(filterFnc)
+: Gets an array of elements than match to filterFnc criteria.  *(see note below)
+
+extractCollection(filterFnc)
+: Created an auto filtered collection from current collection using a filterFnc. *(see note below)
+
+Filter function has object as parameter, and return a boolean 
+
+```javascript
+function filterFnc(object){
+	return true;
+}
+```
+
+###   Auto Filtered collections
+
+#### Declaration
+
+```javascript
+var myCollection=ilModelCollection(config);
+```
+
+In this case, config options are:
+
+sortFnc(a,b)
+: Sort function
+
+updateFnc(promise,params) 
+: Function used to update. 
+Param `promise` to update data when it's ready
+Param `params` with load information when load or reload functions are called
+
+```javascript
+function updateFnc(promise,params){
+	promise.ready(...); //Always must return an array if you are using update method
+}
+```
+preventReload
+: If it is true, never wil reload again, unless forceReload it's true in load or call to reload
+
+#### Declaration shortcut
+
+```javascript
+var myCollection=ilModelCollection.createAuto=function(updateFnc);
+```
+
+#### Operations
+
+update()
+: Updates collection using updateFnc and remplaces all collection with new data
+
+load=function(params,options)
+: It's more sofisticated than update. It add new elements if it is necessary but don't remove old ones. It can recieve a object or array
+
+reload=function(params,options)
+: Same than load, but force reload data calling to updateFnc
