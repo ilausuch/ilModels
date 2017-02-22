@@ -600,29 +600,29 @@ ilModel = function(config){
 		
 		//Check fields
 		this.$fields.forEach(function (item) {
-            if (!(typeof item === 'ilModelField' || item instanceof ilModelField))
-	            throw new ilModelException($this.className,"Error checking field. It's not a ilModelField",item);
-        });
-        
-        //Cache system
-        if (config.cache){
-	        if (!config.cache.$isCache)
-	        	throw new ilModelException(this.className,"Cache object is not a cache",{theCache:config.cache});
-	        	
-	        this.$class.$cache=config.cache;
-		}
-		else if (ilModelConfiguration.cache.createCacheByDefault){
-			this.$class.$cache=new ilModelCache({});
-		}
-		
-		if (this.$class.$cache!==undefined){
-			this.$cache=this.$class.$cache;
-			this.$cache.init(this.$class);
-		}
-		
-		this.$class.getCollection=function(name){
-		    return this.$class.$cache.getCollection(name);
-	    };
+                    if (!(typeof item === 'ilModelField' || item instanceof ilModelField))
+                            throw new ilModelException($this.className,"Error checking field. It's not a ilModelField",item);
+                });
+
+                //Cache system
+                if (config.cache){
+                        if (!config.cache.$isCache)
+                                throw new ilModelException(this.className,"Cache object is not a cache",{theCache:config.cache});
+
+                        this.$class.$cache=config.cache;
+                }
+                else if (ilModelConfiguration.cache.createCacheByDefault){
+                        this.$class.$cache=new ilModelCache({});
+                }
+
+                if (this.$class.$cache!==undefined){
+                        this.$cache=this.$class.$cache;
+                        this.$cache.init(this.$class);
+                }
+
+                this.$class.getCollection=function(name){
+                    return this.$class.$cache.getCollection(name);
+            };
 		
 		//DataProviders
         this.$class.$dataProviders={};
@@ -1052,7 +1052,7 @@ ilModel.setup=function(config){
 		config.context=ilModelConfiguration.defaultContext;
 		
 	if (config.defaults===undefined)
-		config.defaults={}=
+		config.defaults={};
 	
 	//Construcotr (with ilModel as name constructor function)
 	window[config.name]=function ilModelObject(src){

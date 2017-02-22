@@ -135,29 +135,29 @@ ilModelField=function(name, type, config){
 		}
 
 		//Check null or undefined		
-		if (value===undefined || value===null){
+		if (value==undefined || value==null){
 			if (this.required)
 				this.sendException("Required value",value);
 					
 			if (!this.validateNull(value))
 				this.sendException("Invalid null or undefined value",value);
 		}
-		
-		//Check type
-		if (!this.validateType(value))
-			this.sendException("Invalid type",value);
+		else{
+                    //Check type
+                    if (!this.validateType(value))
+                            this.sendException("Invalid type",value);
 			
-		//Check length
-		if (this.type==="string"){
-			if (this.maxLen>0 && svalue.length>this.maxLen)
-				this.sendException("Invalid string length",value);
-				
-		}
-		
-		//Check external function
-		if (this.validateFnc!==undefined && !config.validateFnc(value,this))
-			this.sendException("Fails on validation function",value);
-			
+                    //Check length
+                    if (this.type==="string"){
+                            if (this.maxLen>0 && svalue.length>this.maxLen)
+                                    this.sendException("Invalid string length",value);
+                    }
+
+                    //Check external function
+                    if (this.validateFnc!==undefined && !config.validateFnc(value,this))
+                            this.sendException("Fails on validation function",value);
+                }
+                    
 		return true;
 	};
 };

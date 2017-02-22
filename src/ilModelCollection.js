@@ -89,7 +89,7 @@ ilModelCollection=function(config){
 			this.sendUpdateEvent();
 		}
 		else{
-			throw new ilModelException("ilModelCollection","Object cannot be removed, it doesn't exist",{theCollection:this,theObject:object});
+			//throw new ilModelException("ilModelCollection","Object cannot be removed, it doesn't exist",{theCollection:this,theObject:object});
 		}
     };
     

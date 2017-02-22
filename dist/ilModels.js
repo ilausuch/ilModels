@@ -564,28 +564,28 @@ ilModel = function(config){
 		byDefault(this.$options,"useReplaceInsteadModify", ilModelConfiguration.dataProviders.useReplaceInsteadModify);
 
 		this.$fields.forEach(function (item) {
-            if (!(typeof item === 'ilModelField' || item instanceof ilModelField))
-	            throw new ilModelException($this.className,"Error checking field. It's not a ilModelField",item);
-        });
+                    if (!(typeof item === 'ilModelField' || item instanceof ilModelField))
+                            throw new ilModelException($this.className,"Error checking field. It's not a ilModelField",item);
+                });
 
-        if (config.cache){
-	        if (!config.cache.$isCache)
-	        	throw new ilModelException(this.className,"Cache object is not a cache",{theCache:config.cache});
+                if (config.cache){
+                        if (!config.cache.$isCache)
+                                throw new ilModelException(this.className,"Cache object is not a cache",{theCache:config.cache});
 
-	        		        this.$class.$cache=config.cache;
-		}
-		else if (ilModelConfiguration.cache.createCacheByDefault){
-			this.$class.$cache=new ilModelCache({});
-		}
+                        this.$class.$cache=config.cache;
+                }
+                else if (ilModelConfiguration.cache.createCacheByDefault){
+                        this.$class.$cache=new ilModelCache({});
+                }
 
-				if (this.$class.$cache!==undefined){
-			this.$cache=this.$class.$cache;
-			this.$cache.init(this.$class);
-		}
+                if (this.$class.$cache!==undefined){
+                        this.$cache=this.$class.$cache;
+                        this.$cache.init(this.$class);
+                }
 
-				this.$class.getCollection=function(name){
-		    return this.$class.$cache.getCollection(name);
-	    };
+                this.$class.getCollection=function(name){
+                    return this.$class.$cache.getCollection(name);
+            };
 
         this.$class.$dataProviders={};
 
@@ -983,7 +983,7 @@ ilModel.setup=function(config){
 		config.context=ilModelConfiguration.defaultContext;
 
 			if (config.defaults===undefined)
-		config.defaults={}=
+		config.defaults={};
 
 	window[config.name]=function ilModelObject(src){
 		this.$setupObject(src);	
@@ -1213,7 +1213,6 @@ ilModelCollection=function(config){
 			this.sendUpdateEvent();
 		}
 		else{
-			throw new ilModelException("ilModelCollection","Object cannot be removed, it doesn't exist",{theCollection:this,theObject:object});
 		}
     };
 
@@ -1970,27 +1969,28 @@ ilModelField=function(name, type, config){
 			this.sendException("Invalid empty value",value);
 		}
 
-		if (value===undefined || value===null){
+		if (value==undefined || value==null){
 			if (this.required)
 				this.sendException("Required value",value);
 
 								if (!this.validateNull(value))
 				this.sendException("Invalid null or undefined value",value);
 		}
+		else{
+                    if (!this.validateType(value))
+                            this.sendException("Invalid type",value);
 
-		if (!this.validateType(value))
-			this.sendException("Invalid type",value);
+                    if (this.type==="string"){
+                            if (this.maxLen>0 && svalue.length>this.maxLen)
+                                    this.sendException("Invalid string length",value);
 
-		if (this.type==="string"){
-			if (this.maxLen>0 && svalue.length>this.maxLen)
-				this.sendException("Invalid string length",value);
+                    }
 
-						}
+                    if (this.validateFnc!==undefined && !config.validateFnc(value,this))
+                            this.sendException("Fails on validation function",value);
+                }
 
-		if (this.validateFnc!==undefined && !config.validateFnc(value,this))
-			this.sendException("Fails on validation function",value);
-
-					return true;
+                    		return true;
 	};
 };
 
