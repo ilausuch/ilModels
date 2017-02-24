@@ -76,7 +76,7 @@ ilModelAssociation=function(type,associated,by,options){
 			var $this=this;
 			
 			src.forEach(function(item){
-				object.$associationsCacheData[$this.fieldName].push(new window[$this.associated].createIfNotExist(item));
+				object.$associationsCacheData[$this.fieldName].push(window[$this.associated].createIfNotExist(item));
 			});
 		};
 	};

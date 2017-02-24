@@ -527,6 +527,12 @@ ilModel = function(config){
 		return this.$associations[assocName];
     };
     
+    this.invalideAllAssociations=function(){
+        for (var assocName in this.$class.$associations){
+            this.invalideAssociation(assocName);
+        }
+    }
+    
     this.invalideAssociation=function(assocName){
 	    this.searchAssociation(assocName);
 	    	
@@ -538,8 +544,12 @@ ilModel = function(config){
     this.updateAssociationsBySrc=function(src){
 	    for (var assocName in this.$class.$associations){
 		    var assoc=this.$class.$associations[assocName]; //TODO: raw associations, without options
-			if (src[assoc.associated]!==undefined)
-				assoc.forceRawData(this,src[assoc.associated]);
+                    if (src[assoc.associated]!==undefined){
+                            this.$associations[assocName]=undefined;
+                            this.$associationsCacheData[assocName]=undefined;
+                            
+                            assoc.forceRawData(this,src[assoc.associated]);
+                    }
 		}
     };
     
@@ -737,10 +747,14 @@ ilModel = function(config){
 			
 			if(obj){
 				if (forceUpdate){
-					//DONE Update current object with src	
-					obj.updateFrom(src);
+                                    //Invalidate all associations. Force reload in extends
+                                    //FIX obj.invalideAllAssociations();
+                                    
+                                    //Update data from src
+                                    obj.updateFrom(src);
 				}
 				
+                                //Update associations from source
 				obj.updateAssociationsBySrc(src);
 			}else
 				obj=new $this.$class(src);	

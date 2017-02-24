@@ -497,6 +497,12 @@ ilModel = function(config){
 				return this.$associations[assocName];
     };
 
+        this.invalideAllAssociations=function(){
+        for (var assocName in this.$class.$associations){
+            this.invalideAssociation(assocName);
+        }
+    }
+
         this.invalideAssociation=function(assocName){
 	    this.searchAssociation(assocName);
 
@@ -508,8 +514,12 @@ ilModel = function(config){
         this.updateAssociationsBySrc=function(src){
 	    for (var assocName in this.$class.$associations){
 		    var assoc=this.$class.$associations[assocName]; 
-			if (src[assoc.associated]!==undefined)
-				assoc.forceRawData(this,src[assoc.associated]);
+                    if (src[assoc.associated]!==undefined){
+                            this.$associations[assocName]=undefined;
+                            this.$associationsCacheData[assocName]=undefined;
+
+                                                        assoc.forceRawData(this,src[assoc.associated]);
+                    }
 		}
     };
 
@@ -694,10 +704,11 @@ ilModel = function(config){
 
 						if(obj){
 				if (forceUpdate){
-					obj.updateFrom(src);
+
+                                    obj.updateFrom(src);
 				}
 
-								obj.updateAssociationsBySrc(src);
+				obj.updateAssociationsBySrc(src);
 			}else
 				obj=new $this.$class(src);	
 
@@ -1063,7 +1074,7 @@ ilModelAssociation=function(type,associated,by,options){
 						var $this=this;
 
 						src.forEach(function(item){
-				object.$associationsCacheData[$this.fieldName].push(new window[$this.associated].createIfNotExist(item));
+				object.$associationsCacheData[$this.fieldName].push(window[$this.associated].createIfNotExist(item));
 			});
 		};
 	};
