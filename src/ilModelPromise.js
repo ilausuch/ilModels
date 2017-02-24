@@ -61,7 +61,8 @@ ilModelPromise=function(options){
 			}
 			else{
 				this.successEmitter.register(callback);
-				this.errorEmitter.register(errorCallback);
+                                if (errorCallback!=undefined && errorCallback!=null)
+                                    this.errorEmitter.register(errorCallback);
 			}
 		}
 		else{

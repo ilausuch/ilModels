@@ -1800,28 +1800,31 @@ ilModelDataProviderOData.PkMethods={
 };
 
 ilModelEventsEmitter=function(){
-	this.list=[];
+    this.list=[];
 
-		this.register=function(fnc){
-		this.list.push(fnc);
-	};
+    this.register=function(fnc){
+        if (typeof fnc !== "function")
+            throw new ilModelException("ilModelEventsEmitter.register","fnc is not a function",{theFnc:fnc});
 
-		this.send=function(event){
-		var newList=[];
+                this.list.push(fnc);
+    };
 
-				for (var x=0; x<this.list.length; x++){
-			var fnc=this.list[x];
+    this.send=function(event){
+        var newList=[];
 
-						if (fnc(event)!==false)
-				newList.push(fnc);
-		}
+        for (var x=0; x<this.list.length; x++){
+                var fnc=this.list[x];
 
-				this.list=newList;
-	};
+                if (fnc(event)!==false)
+                        newList.push(fnc);
+        }
 
-		this.length=function(){
-		return this.list.length;
-	};
+            this.list=newList;
+    };
+
+    this.length=function(){
+            return this.list.length;
+    };
 };
 
 
@@ -1983,7 +1986,6 @@ ilModelField=function(name, type, config){
                     if (this.type==="string"){
                             if (this.maxLen>0 && svalue.length>this.maxLen)
                                     this.sendException("Invalid string length",value);
-
                     }
 
                     if (this.validateFnc!==undefined && !config.validateFnc(value,this))
@@ -2224,7 +2226,8 @@ ilModelPromise=function(options){
 			}
 			else{
 				this.successEmitter.register(callback);
-				this.errorEmitter.register(errorCallback);
+                                if (errorCallback!=undefined && errorCallback!=null)
+                                    this.errorEmitter.register(errorCallback);
 			}
 		}
 		else{
@@ -2388,7 +2391,8 @@ ilModelPromiseSync=function(options){
 			}
 			else{
 				this.successEmitter.register(callback);
-				this.errorEmitter.register(errorCallback);
+				if (errorCallback!=undefined && errorCallback!=null)
+                                    this.errorEmitter.register(errorCallback);
 			}
 		}
 		else{
