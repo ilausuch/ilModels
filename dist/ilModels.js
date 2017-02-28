@@ -2182,102 +2182,105 @@ ilModelHttpAngular = function (config) {
 
 
 ilModelPromise=function(options){
-	this.data=undefined;
-	this.isLoading=true;
-	this.isError=false;
-	this.hasFinished=false;
+    this.$isPromise=true;
 
-		this.successEmitter=new ilModelEventsEmitter();
-	this.errorEmitter=new ilModelEventsEmitter();
+    this.data=undefined;
+    this.isLoading=true;
+    this.isError=false;
+    this.hasFinished=false;
 
-		if (options===undefined)
-		options={};
+    this.successEmitter=new ilModelEventsEmitter();
+    this.errorEmitter=new ilModelEventsEmitter();
 
-			if (options.context===undefined)
-		this.context=ilModelConfiguration.defaultContext;
-	else
-		this.context=options.context;
+    if (options===undefined)
+            options={};
 
-			if (options.owner!==undefined)
-		this.owner=options.owner;
+    if (options.context===undefined)
+            this.context=ilModelConfiguration.defaultContext;
+    else
+            this.context=options.context;
 
-		this.ready=function(data){
-		this.data=data;
-		this.isLoading=false;
-		this.hasFinished=true;
+    if (options.owner!==undefined)
+            this.owner=options.owner;
 
-				var $this=this;
-		this.context.delayFnc(function(){
-			if ($this.successEmitter.length()>0)
-				$this.successEmitter.send($this.data);
-		});
+    this.ready=function(data){
+            this.data=data;
+            this.isLoading=false;
+            this.hasFinished=true;
 
-			};
+            var $this=this;
+            this.context.delayFnc(function(){
+                    if ($this.successEmitter.length()>0)
+                            $this.successEmitter.send($this.data);
+            });
 
-			this.error=function(err){
-		var $this=this;
-		this.hasFinished=true;
-		this.isLoading=false;
-		this.isError=false;
-		this.error=err;
+    };
 
-						this.context.delayFnc(function(){
-			if ($this.errorEmitter.length()>0)
-				$this.errorEmitter.send($this.error);
-			else
-				throw new ilModelException("ilModelPromise","Error loading data",{theOwner:$this.owner,error:err});
-		});
-	};
+    this.error=function(err){
+            var $this=this;
+            this.hasFinished=true;
+            this.isLoading=false;
+            this.isError=false;
+            this.error=err;
 
-		this.then=function(callback,errorCallback){
-		if (!this.hasFinished){
-			if (callback instanceof ilModelPromise || callback instanceof ilModelPromiseSync){
-				this.successEmitter.register(function(data){callback.ready(data);});
-				this.errorEmitter.register(function(err){callback.error(err);});
-			}
-			else{
-				this.successEmitter.register(callback);
-                                if (errorCallback!=undefined && errorCallback!=null)
-                                    this.errorEmitter.register(errorCallback);
-			}
-		}
-		else{
-			var $this=this;
-			this.context.delayFnc(function(){
-				if (!$this.isError){
-					if (callback instanceof ilModelPromise || callback instanceof ilModelPromiseSync){
-						callback.ready($this.data);
-					}
-					else{
-						callback($this.data);
-					}
-				}
-				else{
-					if (callback instanceof ilModelPromise || callback instanceof ilModelPromiseSync){
-						errorCallback.error($this.error);
-					}
-					else{
-						errorCallback(error);
-					}
-				}
-			});
+            this.context.delayFnc(function(){
+                    if ($this.errorEmitter.length()>0)
+                            $this.errorEmitter.send($this.error);
+                    else
+                            throw new ilModelException("ilModelPromise","Error loading data",{theOwner:$this.owner,error:err});
+            });
+    };
 
-					}
+    this.then=function(callback,errorCallback){
+            if (!this.hasFinished){
+                    if (callback.$isPromise){
+                            this.successEmitter.register(function(data){callback.ready(data);});
+                            this.errorEmitter.register(function(err){callback.error(err);});
+                    }
+                    else{
+                            this.successEmitter.register(callback);
+                            if (errorCallback!=undefined && errorCallback!=null)
+                                this.errorEmitter.register(errorCallback);
+                    }
+            }
+            else{
+                    var $this=this;
+                    this.context.delayFnc(function(){
+                            if (!$this.isError){
+                                    if (callback instanceof ilModelPromise || callback instanceof ilModelPromiseSync){
+                                            callback.ready($this.data);
+                                    }
+                                    else{
+                                            callback($this.data);
+                                    }
+                            }
+                            else{
+                                    if (callback instanceof ilModelPromise || callback instanceof ilModelPromiseSync){
+                                            errorCallback.error($this.error);
+                                    }
+                                    else{
+                                            errorCallback(error);
+                                    }
+                            }
+                    });
 
-
-						return this;
-	};
+            }
 
 
-		if (options.data!==undefined){
-		this.ready(options.data);
-	}
+            return this;
+    };
+
+
+    if (options.data!==undefined){
+            this.ready(options.data);
+    }
 };
 
 
 ilModelPromiseSync=function(options){
+	this.$isPromise=true;
 
-		this.isLoading=true;
+        	this.isLoading=true;
 	this.isError=false;
 	this.hasFinished=false;
 
@@ -2310,7 +2313,9 @@ ilModelPromiseSync=function(options){
 			options={};
 
 					var syncObject={
-			id:this.syncList.length,
+                        $isPromise:true,
+
+                        			id:this.syncList.length,
 
 						options:options,
 
@@ -2396,7 +2401,7 @@ ilModelPromiseSync=function(options){
 
 			this.then=function(callback,errorCallback){
 		if (!this.hasFinished){
-			if (callback instanceof ilModelPromise || callback instanceof ilModelPromiseSync){
+			if (callback.$isPromise){
 				this.successEmitter.register(function(data){callback.ready(data);});
 				this.errorEmitter.register(function(err){callback.error(err);});
 			}

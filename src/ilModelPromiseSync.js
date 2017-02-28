@@ -7,7 +7,8 @@
 
 ilModelPromiseSync=function(options){
 	//IMPORTANT: Don't use for
-	
+	this.$isPromise=true;
+        
 	this.isLoading=true;
 	this.isError=false;
 	this.hasFinished=false;
@@ -41,6 +42,8 @@ ilModelPromiseSync=function(options){
 			options={};
 			
 		var syncObject={
+                        $isPromise:true,
+                        
 			id:this.syncList.length,
 			
 			options:options,
@@ -127,7 +130,7 @@ ilModelPromiseSync=function(options){
 		
 	this.then=function(callback,errorCallback){
 		if (!this.hasFinished){
-			if (callback instanceof ilModelPromise || callback instanceof ilModelPromiseSync){
+			if (callback.$isPromise){
 				this.successEmitter.register(function(data){callback.ready(data);});
 				this.errorEmitter.register(function(err){callback.error(err);});
 			}
