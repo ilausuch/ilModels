@@ -638,7 +638,7 @@ ilModel.setup({
 	
 	//Object methods
 	methods:{
-		<name of method>:function(){
+		<name of method>:function(object){
 		}
 	},
 
@@ -786,6 +786,18 @@ myPurchase.$sandbox.$Date.add(1,"h");
 
 Two models can be related using associations. It allows an easy way to navigate and usign extends. 
 
+
+    ilModelAssociation.one(associated,by,options) 
+
+associated
+: name of associated model
+
+by
+: Object with pairs of local foreing key and remote primary key
+
+options
+: You can define diferent options like extends
+
 For this example whe are using 
 
 Customer
@@ -809,6 +821,20 @@ associations:{
 
 #### Multiplicity
 
+    ilModelAssociation.multiple(associated,by,query,options) 
+
+associated
+: name of associated model
+
+by
+: Object with pairs of local primary key and remote foreign key
+
+query (optional)
+: You can define a query to filter the list
+
+options (optional)
+: You can define diferent options like extends
+
 For instance,  an Customer has multiple purchases. In Customer model:
 
 ```javascript
@@ -829,7 +855,8 @@ associations:{
 	$Purchase:ilModelAssociation.multiple(
 		"Purchase",
 		{"Id":"CustomerFk"},
-		ilModelFieldQuery.Equals("Completed",true) //Only completed purchases
+		ilModelFieldQuery
+			.Equals("Completed",true) //Only completed purchases
 	) 
 }
 ```
@@ -860,7 +887,7 @@ In each case if nothing is specified it will use ilModelConfiguration defaults
 
 validateOnCreate
 : Validate fields when object is created from data provider
-by default is tru
+by default is true
 
 validateOnCreateNew
 : Validate fields when created a new object
@@ -1120,13 +1147,13 @@ ilModelConfiguration.dataProviders.forceReload
 ilModelConfiguration.dataProviders.useReplaceInsteadModify
 : Use replace operation instead modify operation in update calls. It depends from how data provider has been design
 
-ilModelConfiguration.dataProviders.cache.createCacheByDefault
+ilModelConfiguration.cache.createCacheByDefault
 : Each model has a cache to have a good performance when you has to get an object of this model and to have unique object representing an object on data base
 
-ilModelConfiguration.dataProviders.cache.autoInsert
+ilModelConfiguration.cache.autoInsert
 : It is related to previous createCacheByDefault because define that a new model is created this is inserted on cache
 
-ilModelConfiguration.dataProviders.cache.collections.preventReload
+ilModelConfiguration.cache.collections.preventReload
 : For collections, prevent reload and application must have to do the reloads 
 
 
@@ -1235,3 +1262,7 @@ load=function(params,options)
 
 reload=function(params,options)
 : Same than load, but force reload data calling to updateFnc
+
+
+
+
