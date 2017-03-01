@@ -54,10 +54,10 @@ ilModelDataProviderOData = function (config) {
         if (config.skip !== undefined)
             url = url + "$skip=" + config.skip + "&";
 
-		if (config.expand !== undefined)
+        if (config.expand !== undefined)
             url = url + "$expand=" + config.expand + "&";
 
-		if (config.select !== undefined)
+	if (config.select !== undefined)
             url = url + "$select=" + config.select + "&";
 
         if (config.queryString !== undefined)
@@ -74,6 +74,7 @@ ilModelDataProviderOData = function (config) {
 			
 			
         if (this.config.debug) console.debug("OData", "call", call);
+        
         var $this = this;
 
 		var call={
