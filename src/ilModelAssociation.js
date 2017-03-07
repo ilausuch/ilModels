@@ -25,11 +25,19 @@ ilModelAssociation=function(type,associated,by,query,options){
             this.ownerClass=ownerClass;
 	};	
 		
-	this.get=function(object){
+	this.get=function(object,options){
+            if (options===undefined)
+                options={};
+            
             if (object.$associationsCacheData[this.fieldName]!==undefined){
+                if (!options.forceReload){
                     var promise=new ilModelPromise();
                     promise.ready(object.$associationsCacheData[this.fieldName]);
                     return promise;	
+                }else{
+                    delete object.$associationsCacheData[this.fieldName];
+                    object.$associationsCacheData[this.fieldName]=undefined;
+                }
             }
 
             var pk={};
@@ -45,7 +53,7 @@ ilModelAssociation=function(type,associated,by,query,options){
             //forceReload
 
             if (this.type==="one"){
-                return window[this.associated].get(pk,{forceReload:this.options.forceReload});
+                return window[this.associated].get(pk,options);
             }
 
             if (this.type==="multiple"){

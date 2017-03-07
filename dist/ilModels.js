@@ -486,13 +486,13 @@ ilModel = function(config){
 				throw new ilModelException(this.$className,"Invalid association",{theAssocName:assocName});
     };
 
-        this.getAssociation=function(assocName){
+        this.getAssociation=function(assocName,options){
 	    var assoc=this.searchAssociation(assocName);
 
 	    				if (this.$associations[assocName]!==undefined)
 			return this.$associations[assocName];
 
-				this.$associations[assocName]=assoc.get(this);
+				this.$associations[assocName]=assoc.get(this,options);
 
 				return this.$associations[assocName];
     };
@@ -506,9 +506,13 @@ ilModel = function(config){
         this.invalideAssociation=function(assocName){
 	    this.searchAssociation(assocName);
 
-	    		    this.$associations[assocName]=undefined;
-	    this.$associationsCacheData[assocName]=undefined;
-	    return this.getAssociation(assocName);
+	    		    delete this.$associations[assocName];
+            this.$associations[assocName]=undefined;
+
+            	    delete this.$associationsCacheData[assocName];
+            this.$associationsCacheData[assocName]=undefined;
+
+            	    return this.getAssociation(assocName,{forceReload:true});
     };
 
         this.updateAssociationsBySrc=function(src){
@@ -1024,11 +1028,19 @@ ilModelAssociation=function(type,associated,by,query,options){
             this.ownerClass=ownerClass;
 	};	
 
-			this.get=function(object){
-            if (object.$associationsCacheData[this.fieldName]!==undefined){
+			this.get=function(object,options){
+            if (options===undefined)
+                options={};
+
+                        if (object.$associationsCacheData[this.fieldName]!==undefined){
+                if (!options.forceReload){
                     var promise=new ilModelPromise();
                     promise.ready(object.$associationsCacheData[this.fieldName]);
                     return promise;	
+                }else{
+                    delete object.$associationsCacheData[this.fieldName];
+                    object.$associationsCacheData[this.fieldName]=undefined;
+                }
             }
 
             var pk={};
@@ -1043,7 +1055,7 @@ ilModelAssociation=function(type,associated,by,query,options){
 
 
             if (this.type==="one"){
-                return window[this.associated].get(pk,{forceReload:this.options.forceReload});
+                return window[this.associated].get(pk,options);
             }
 
             if (this.type==="multiple"){
@@ -1624,11 +1636,11 @@ ilModelDataProviderOData = function (config) {
 
 	    		    var query=ilModelFieldQuery.And(list);
 
-        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true, first:true,top:1 }, options));
+        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true, first:true,top:1 }, options),options);
     };
 
         this.query=function (query,options) {
-        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true }, options));
+        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true }, options),options);
     };
 
         this.all=function (options) {

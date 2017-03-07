@@ -214,11 +214,11 @@ ilModelDataProviderOData = function (config) {
 	    var query=ilModelFieldQuery.And(list);
 	    
         //return this.$get(this.prepareOptions({ pk: pk, isList:false},options));
-        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true, first:true,top:1 }, options));
+        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true, first:true,top:1 }, options),options);
     };
     
     this.query=function (query,options) {
-        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true }, options));
+        return this.$get(this.prepareOptions({ queryString: ilModelDataProviderOData.toQueryString(this.parentClass,query), isList: true }, options),options);
     };
     
     this.all=function (options) {

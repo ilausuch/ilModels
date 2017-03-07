@@ -516,13 +516,13 @@ ilModel = function(config){
 		throw new ilModelException(this.$className,"Invalid association",{theAssocName:assocName});
     };
     
-    this.getAssociation=function(assocName){
+    this.getAssociation=function(assocName,options){
 	    var assoc=this.searchAssociation(assocName);
 	    		
 		if (this.$associations[assocName]!==undefined)
 			return this.$associations[assocName];
 		
-		this.$associations[assocName]=assoc.get(this);
+		this.$associations[assocName]=assoc.get(this,options);
 		
 		return this.$associations[assocName];
     };
@@ -536,9 +536,13 @@ ilModel = function(config){
     this.invalideAssociation=function(assocName){
 	    this.searchAssociation(assocName);
 	    	
-	    this.$associations[assocName]=undefined;
-	    this.$associationsCacheData[assocName]=undefined;
-	    return this.getAssociation(assocName);
+	    delete this.$associations[assocName];
+            this.$associations[assocName]=undefined;
+            
+	    delete this.$associationsCacheData[assocName];
+            this.$associationsCacheData[assocName]=undefined;
+            
+	    return this.getAssociation(assocName,{forceReload:true});
     };
     
     this.updateAssociationsBySrc=function(src){
