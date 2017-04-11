@@ -27,7 +27,7 @@ ilModelAssociation=function(type,associated,by,query,options){
 		
 	this.get=function(object,options){
             if (options===undefined)
-                options={};
+                options=this.options;
             
             if (object.$associationsCacheData[this.fieldName]!==undefined){
                 if (!options.forceReload){
