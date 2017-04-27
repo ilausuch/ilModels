@@ -18,7 +18,7 @@ ilModelAssociation=function(type,associated,by,query,options){
             this.options={};
 		
 	if (this.options.forceReload===undefined)
-            this.options.forceReload=true;
+            this.options.forceReload=false;
 	
 	this.setup=function(fieldName,ownerClass){
             this.fieldName=fieldName;

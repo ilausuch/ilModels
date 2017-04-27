@@ -3,6 +3,7 @@ var concat  = require('gulp-concat');
 var strip = require('gulp-strip-comments');
 var uglify = require('gulp-uglify');
 var headerfooter = require('gulp-header-footer');
+var gulpSequence = require('gulp-sequence');
 
 var header="\
 /*\n\
@@ -32,4 +33,6 @@ gulp.task('minimize', function(){
         .pipe(gulp.dest('dist'));
 });
 
-gulp.task("build",["compile","minimize"]);
+gulp.task("build",function(cb){
+    gulpSequence('compile','minimize',cb);
+});

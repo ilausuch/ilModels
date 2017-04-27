@@ -102,21 +102,21 @@ ilModel = function(config){
     
     this.checkPk = function(pk){
 	    if (pk !== null && typeof pk !== 'object')
-			throw new ilModelException("ilModel","PK is not valid",pk);
+                throw new ilModelException("ilModel","PK is not valid",pk);
 			    
 		var coincidence=true;
 		var $this=this;
 		
-	    this.$fields.some(function (field) {
-			if (field.pk){
-				if (pk[field.name]===undefined)
-					throw new ilModelException("ilModel.checkPk","PK is not valid, requires "+field.name+" field",{thePk:pk,theItem:$this});
-				
-				if(pk[field.name]!==$this[field.name]){
-					coincidence=false;
-					return false;
-				}
-			}
+                this.$fields.some(function (field) {
+                    if (field.pk){
+                        if (pk[field.name]===undefined)
+                                throw new ilModelException("ilModel.checkPk","PK is not valid, requires "+field.name+" field",{thePk:pk,theItem:$this});
+
+                        if(pk[field.name]!==$this[field.name]){
+                                coincidence=false;
+                                return false;
+                        }
+                    }
 		});
 		
 		return coincidence;
@@ -717,7 +717,8 @@ ilModel = function(config){
 			if (options.dataProvider===undefined)
 				options.dataProvider=this.$class.$options.defaultDataProvider;
 			
-			options.dataProvider=this.$class.$dataProviders[options.dataProvider];
+                        if (typeof options.dataProvider === 'string' || options.dataProvider instanceof String)
+                            options.dataProvider=this.$class.$dataProviders[options.dataProvider];
 				
 			if (options.dataProvider===undefined)
 				throw new ilModelException($this.$className,"There are no a data provider",options);
