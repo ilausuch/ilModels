@@ -426,10 +426,10 @@ ilModel = function(config){
 			
 			if ($this.$isNew){
 				options.dataProvider.create(info.changes).then(function(data){
-					promise.ready(data);		
+                                    promise.ready(data);		
 				},
 				function(err){
-					promise.error(err);
+                                    promise.error(err);
 				});
 			}
 			else{

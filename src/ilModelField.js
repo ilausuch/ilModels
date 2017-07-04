@@ -101,11 +101,11 @@ ilModelField=function(name, type, config){
 			break;
 			
 			case "int":
-				return value === parseInt(value);
+                                return (""+value).match(/^-?\d+$/)!==null;
 			break;
 			
 			case "float":
-				return (""+value).match(/^\d+.?\d*$/)!==null;
+				return (""+value).match(/^-?(\d*\.\d+|\d+(\.\d+)?)$/)!==null;
 			break;
 			
 			case "string":
